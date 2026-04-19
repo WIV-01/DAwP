@@ -1,2 +1,0 @@
-# Winc
-Winc Acadamy Course
