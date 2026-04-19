@@ -1,1 +1,1 @@
-Project WInc Academy - Data Analyst with Python
+Winc Academy project - Data Analyst with Python.
