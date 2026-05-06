@@ -1,4 +1,3 @@
-
 ###################################
 ### Import ########################
 ###################################
@@ -7,7 +6,6 @@ import sys  # Stopt het programma direct en voorkomt dat de rest van de code doo
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
 
 ###################################
 ### Functies ######################
@@ -344,6 +342,126 @@ plt.show()
 ###################################
 ### Vraag 3 #######################
 ###################################
-# Which non-fossil fuel energy technology will have the best price in the future?
+# Which non-fossil fuel energy source is expected to grow the most in the future?
+###################################
+#
+# In deze analyse wordt onderzocht welke non-fossil fuel energiebron
+# naar verwachting de sterkste toekomstige groei laat zien.
+#
+# Omdat in de dataset geen directe prijsgegevens beschikbaar zijn,
+# wordt het aandeel van duurzame energiebronnen in het totale
+# energiegebruik gebruikt als indicator voor toekomstige groei.
+#
+# Hiervoor wordt lineaire regressie toegepast op historische wereldwijde
+# data van zonne-energie, windenergie, waterkracht en kernenergie.
+#
+# De energiebron met de hoogste positieve helling wordt beschouwd als
+# de energiebron met de sterkste voorspelde toekomstige groei.
 ###################################
 
+#--- Energy data ophalen ---
+#---------------------------
+ENERGY_URL = "https://raw.githubusercontent.com/owid/energy-data/master/owid-energy-data.csv"
+
+df_3 = data_ophalen(ENERGY_URL)
+
+#--- Relevante kolommen selecteren ---
+#-------------------------------------
+kolommen_vraag_3 = [
+    "country",
+    "year",
+    "solar_share_energy",
+    "wind_share_energy",
+    "hydro_share_energy",
+    "nuclear_share_energy"
+]
+
+df_3 = selecteer_kolommen(df_3, kolommen_vraag_3)
+
+#--- Data opschonen ---
+#----------------------
+# Rijen met ontbrekende waarden in de gekozen energiekolommen worden verwijderd.
+# Dit is nodig omdat lineaire regressie niet goed werkt met ontbrekende waarden.
+
+df_3 = data_opschonen(
+    df_3,
+    [
+        "solar_share_energy",
+        "wind_share_energy",
+        "hydro_share_energy",
+        "nuclear_share_energy"
+    ]
+)
+
+#--- Wereldwijde data selecteren ---
+#-----------------------------------
+# Voor deze voorspelling wordt gekeken naar de wereldwijde ontwikkeling.
+# Hierdoor ontstaat een algemene trend voor non-fossil fuel energy.
+
+df_wereld = df_3[df_3["country"] == "World"].copy()
+
+#--- Energiebronnen vastleggen ---
+#---------------------------------
+# De energiekolommen worden gekoppeld aan duidelijke namen.
+# Hierdoor kan de analyse generiek worden uitgevoerd met een for-loop.
+
+energiebronnen = {
+    "Solar": "solar_share_energy",
+    "Wind": "wind_share_energy",
+    "Hydro": "hydro_share_energy",
+    "Nuclear": "nuclear_share_energy"
+}
+
+#--- Lineaire regressie toepassen ---
+#------------------------------------
+# Per energiebron wordt een regressiemodel gemaakt.
+# De helling van de regressielijn geeft aan hoe snel de energiebron groeit.
+
+toekomstige_jaren = np.array(range(2025, 2041))
+
+groei_per_energiebron = {}
+
+plt.figure(figsize=(10, 6))
+
+for naam, kolom in energiebronnen.items():
+    y = df_wereld[kolom].values
+
+    helling, startwaarde = np.polyfit(df_wereld["year"], y, 1)
+
+    voorspelling = helling * toekomstige_jaren + startwaarde
+
+    groei_per_energiebron[naam] = helling
+
+    plt.plot(
+        toekomstige_jaren,
+        voorspelling,
+        label=naam
+    )
+
+#--- Beste energiebron bepalen ---
+#---------------------------------
+# De energiebron met de hoogste helling heeft de sterkste voorspelde groei.
+
+beste_energiebron = max(groei_per_energiebron, key=groei_per_energiebron.get)
+
+print("Voorspelde groei per energiebron:")
+print("---------------------------------")
+
+for naam, groei in groei_per_energiebron.items():
+    print(f"{naam}: {groei:.4f}")
+
+print("\nBeste toekomstige non-fossil fuel energiebron:")
+print(beste_energiebron)
+
+#--- Grafiek weergeven ---
+#-------------------------
+# De grafiek toont de voorspelde ontwikkeling van verschillende
+# non-fossil fuel energiebronnen.
+
+plt.title("Vraag 3: Future growth of non-fossil fuel energy")
+plt.xlabel("Year")
+plt.ylabel("Projected share of energy use (%)")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
