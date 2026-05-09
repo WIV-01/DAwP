@@ -142,56 +142,6 @@ print("\nCorrelatie:\n-------------------------------------------------\n", corr
 # omdat deze de hoogste correlatie heeft (~0.73).
 # Dit suggereert dat energieverbruik per persoon de belangrijkste indicator is.
 
-#--- Scatterplot weergeven ---
-#-----------------------------
-# De relatie tussen energieverbruik per persoon en CO2-uitstoot per persoon
-# wordt weergegeven in een scatterplot. Hiermee wordt visueel gemaakt of er
-# een verband bestaat tussen deze variabelen en hoe sterk deze relatie is.
-
-plt.figure(figsize=(8,5))
-plt.scatter(df["energy_per_capita"], df["co2_per_capita"], alpha=0.5, label="Data")
-
-plt.xlabel("Energy per capita")
-plt.ylabel("CO2 per capita")
-plt.title("Relatie tussen energieverbruik per capita en CO2-uitstoot per capita")
-
-#--- Trendlijn berekenen (lineaire regressie) ---
-#-----------------------------------------------
-# Met np.polyfit wordt de beste rechte lijn berekend die de relatie tussen
-# energieverbruik per persoon en CO2-uitstoot per persoon beschrijft.
-# De uitkomst bevat de helling (a) en het startpunt (b) van de lijn (y = ax + b).
-
-z = np.polyfit(df["energy_per_capita"], df["co2_per_capita"], 1)
-p = np.poly1d(z)
-
-# Dit voorkomt dat de trendlijn in een willekeurige volgorde wordt getekend
-# en zorgt voor een vloeiende lijn van links naar rechts.
-x_lijn = np.sort(df["energy_per_capita"]) 
-#-----------------------------------------------
-
-plt.plot(x_lijn, p(x_lijn), color="red", linewidth=2, label="Trendlijn")
-plt.legend()
-plt.grid()
-plt.show()
-
-#--- Staafdiagram weergeven ---
-#------------------------------
-# De top 10 landen met de hoogste gemiddelde CO2-uitstoot per persoon
-# worden weergegeven in een staafdiagram. Dit geeft een duidelijk overzicht
-# van welke landen het meest bijdragen aan hoge uitstoot.
-
-plt.figure(figsize=(10, 6))
-
-top10.sort_values().plot(kind="barh", label="Gemiddelde CO2 per capita")
-
-plt.title("Top 10 landen met hoogste CO2-uitstoot per capita")
-plt.xlabel("CO2 per capita")
-plt.ylabel("Land")
-
-plt.tight_layout()
-
-plt.show()
-
 
 
 ###################################
@@ -251,8 +201,16 @@ df_2 = df_2.dropna(subset=["year"])
 
 #--- Filter vanaf 1990 ---
 #-------------------------
-# Alleen data vanaf 1990 wordt gebruikt, zodat landen over een moderne
-# en beter vergelijkbare periode worden geanalyseerd.
+# Alleen data vanaf 1990 wordt gebruikt.
+# De dataset bevat gegevens over een zeer lange periode,
+# waarbij sommige landen al data hebben vanaf de 18e of 19e eeuw
+# en andere landen pas veel later gegevens bevatten.
+#
+# Hierdoor ontstaan grote verschillen tussen de periodes
+# die per land worden vergeleken.
+#
+# Door alleen data vanaf 1990 te gebruiken, worden landen
+# over een recentere en beter vergelijkbare periode geanalyseerd.
 
 df_2 = df_2[df_2["year"] >= 1990].copy()
 
@@ -458,9 +416,9 @@ print(beste_energiebron)
 # De grafiek toont de voorspelde ontwikkeling van verschillende
 # non-fossil fuel energiebronnen.
 
-plt.title("Vraag 3: Future growth of non-fossil fuel energy")
-plt.xlabel("Year")
-plt.ylabel("Projected share of energy use (%)")
+plt.title("Vraag 3: Toekomstige groei van non-fossil fuel energie")
+plt.xlabel("Jaar")
+plt.ylabel("Voorspeld aandeel in energiegebruik (%)")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
