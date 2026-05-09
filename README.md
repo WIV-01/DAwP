@@ -34,7 +34,7 @@ De data wordt opgehaald via *Our World in Data* en geanalyseerd met Python.
 DAwP/
 │
 ├── main.py
-├── Report.docx
+├── Report.pdf
 └── README.md
 
 ---
